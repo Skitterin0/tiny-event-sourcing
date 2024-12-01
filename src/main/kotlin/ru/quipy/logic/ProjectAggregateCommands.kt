@@ -37,6 +37,6 @@ fun ProjectAggregateState.assignTagToTask(tagId: UUID, taskId: UUID): TagAssigne
     return TagAssignedToTaskEvent(projectId = this.getId(), tagId = tagId, taskId = taskId)
 }
 
-fun ProjectAggregateState.addParticipant(userId: UUID): ParticipantAddedEvent {
-    return ParticipantAddedEvent(projectId = this.getId(), userId = userId)
+fun ProjectAggregateState.addParticipant(userId: UUID, username: String): ParticipantAddedEvent {
+    return ParticipantAddedEvent(projectId = this.getId(), userId = userId, username = username)
 }
