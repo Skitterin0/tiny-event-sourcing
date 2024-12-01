@@ -11,7 +11,7 @@ import ru.quipy.streams.annotation.SubscribeEvent
 
 @Service
 @AggregateSubscriber(
-    aggregateClass = ProjectAggregate::class, subscriberName = "demo-subs-stream"
+    aggregateClass = ProjectAggregate::class, subscriberName = "project-subs-stream"
 )
 class AnnotationBasedProjectEventsSubscriber {
 
