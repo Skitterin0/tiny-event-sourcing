@@ -19,9 +19,9 @@ class UserController(
         val userEsService: EventSourcingService<UUID, UserAggregate, UserAggregateState>
 ) {
 
-    @PostMapping("/{username}")
+    @PostMapping("/register")
     fun registeredUser(
-            @PathVariable username: String,
+            @RequestParam username: String,
             @RequestParam fullName: String,
             @RequestParam password: String) : UserRegisteredEvent {
         return userEsService.create { it.register(UUID.randomUUID(), username, fullName, password) }

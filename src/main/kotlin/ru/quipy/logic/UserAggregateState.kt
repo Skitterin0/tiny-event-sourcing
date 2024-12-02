@@ -8,7 +8,7 @@ import java.util.UUID
 
 class UserAggregateState : AggregateState<UUID, UserAggregate> {
     private lateinit var userId: UUID
-    var createdAt: Long = System.currentTimeMillis()
+    val createdAt: Long = System.currentTimeMillis()
     var updatedAt: Long = System.currentTimeMillis()
 
     lateinit var username: String
