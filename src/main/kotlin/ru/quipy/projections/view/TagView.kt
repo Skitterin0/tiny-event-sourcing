@@ -14,6 +14,5 @@ class TagView {
 		var projectId: UUID,
 		var tagName: String,
 		var tagColor: String,
-		var orderIndex: Int,
 	): Unique<UUID>
 }

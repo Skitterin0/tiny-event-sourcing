@@ -11,8 +11,8 @@ class UserView {
 	data class UserInfo(
 		@Id
 		override val id: UUID,
-		var nickname: String,
-		var userName: String,
+		var username: String,
+		var fullName: String,
 		var password: String,
 		val projectIds: MutableSet<UUID> = mutableSetOf(),
 		val tasksAssignedIds: MutableSet<UUID> = mutableSetOf(),
