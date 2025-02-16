@@ -12,8 +12,9 @@ class TaskView {
 		@Id
 		override val id: UUID,
 		var projectId: UUID,
-		var performerId: UUID,
-		var tagId: UUID,
+		var taskName: String,
+		var performerId: UUID?,
+		var tagId: UUID?,
 		var creationDate: Date,
 		var lastUpdatedDate: Date,
 	): Unique<UUID>

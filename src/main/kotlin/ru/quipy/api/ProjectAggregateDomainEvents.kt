@@ -49,7 +49,7 @@ class TaskCreatedEvent(
     name = TASK_CREATED_EVENT,
     createdAt = createdAt
 )
-// task, tag?
+// task
 @DomainEvent(name = TAG_ASSIGNED_TO_TASK_EVENT)
 class TagAssignedToTaskEvent(
     val projectId: UUID,
