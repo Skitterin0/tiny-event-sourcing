@@ -2,10 +2,11 @@ package ru.quipy.projections
 
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import ru.quipy.api.UserAggregate
 import ru.quipy.api.UserRegisteredEvent
-import ru.quipy.projections.service.UserService
+import ru.quipy.projections.service.UserViewService
 import ru.quipy.streams.annotation.AggregateSubscriber
 import ru.quipy.streams.annotation.SubscribeEvent
 
@@ -14,13 +15,11 @@ import ru.quipy.streams.annotation.SubscribeEvent
         aggregateClass = UserAggregate::class, subscriberName = "user-subs-stream"
 )
 class AnnotationBasedUserEventsSubscriber {
-    lateinit var userService: UserService
 
     val logger: Logger = LoggerFactory.getLogger(AnnotationBasedUserEventsSubscriber::class.java)
 
     @SubscribeEvent
     fun userRegisteredSubscriber(event: UserRegisteredEvent) {
         logger.info("User registered: {}", event.username)
-        userService.addUser(event)
     }
 }

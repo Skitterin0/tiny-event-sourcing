@@ -1,5 +1,7 @@
 package ru.quipy.projections.service
 
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.stereotype.Service
 import ru.quipy.api.*
 import ru.quipy.core.EventSourcingService
 import ru.quipy.logic.ProjectAggregateState
@@ -9,6 +11,7 @@ import ru.quipy.streams.AggregateSubscriptionsManager
 import java.util.*
 import javax.annotation.PostConstruct
 
+@Service
 class TaskViewService(
 	private val taskRepository: TaskRepository,
 	private val subscriptionsManager: AggregateSubscriptionsManager,
@@ -53,7 +56,7 @@ class TaskViewService(
 
 	private fun setPerformer(event: TaskPerformerSetEvent) {
 		val task = taskRepository.findById(event.taskId).orElseThrow()
-		task.performerId = event.userId
+		task.userId = event.userId
 		taskRepository.save(task)
 	}
 

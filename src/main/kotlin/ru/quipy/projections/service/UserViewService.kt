@@ -9,7 +9,6 @@ import ru.quipy.streams.AggregateSubscriptionsManager
 import javax.annotation.PostConstruct
 
 class UserViewService (
-	private val projectRepository: ProjectRepository,
 	private val userRepository: UserRepository,
 	private val subscriptionsManager: AggregateSubscriptionsManager
 ) {

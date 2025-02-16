@@ -5,5 +5,5 @@ import ru.quipy.projections.view.ProjectView
 import java.util.UUID
 
 interface ProjectRepository: MongoRepository<ProjectView.ProjectInfo, UUID> {
-	fun findByProjectName(projectName: String): List<ProjectView.ProjectInfo>
+	fun findByProjectTitle(projectTitle: String): List<ProjectView.ProjectInfo>
 }

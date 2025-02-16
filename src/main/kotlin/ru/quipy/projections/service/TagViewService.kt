@@ -1,5 +1,7 @@
 package ru.quipy.projections.service
 
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.stereotype.Service
 import ru.quipy.api.ProjectAggregate
 import ru.quipy.api.TagCreatedEvent
 import ru.quipy.api.TagDeletedEvent
@@ -9,6 +11,7 @@ import ru.quipy.streams.AggregateSubscriptionsManager
 import java.util.*
 import javax.annotation.PostConstruct
 
+@Service
 class TagViewService(
 	private val tagRepository: TagRepository,
 	private val subscriptionsManager: AggregateSubscriptionsManager
