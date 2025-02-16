@@ -15,6 +15,7 @@ const val TAG_DELETED_EVENT = "TAG_DELETED_EVENT"
 const val TASK_DELETED_EVENT = "TASK_DELETED_EVENT"
 
 // API
+// project
 @DomainEvent(name = PROJECT_CREATED_EVENT)
 class ProjectCreatedEvent(
     val projectId: UUID,
@@ -25,7 +26,7 @@ class ProjectCreatedEvent(
     name = PROJECT_CREATED_EVENT,
     createdAt = createdAt,
 )
-
+// project, tag?
 @DomainEvent(name = TAG_CREATED_EVENT)
 class TagCreatedEvent(
     val projectId: UUID,
@@ -37,7 +38,7 @@ class TagCreatedEvent(
     name = TAG_CREATED_EVENT,
     createdAt = createdAt,
 )
-
+// project, task
 @DomainEvent(name = TASK_CREATED_EVENT)
 class TaskCreatedEvent(
     val projectId: UUID,
@@ -48,7 +49,7 @@ class TaskCreatedEvent(
     name = TASK_CREATED_EVENT,
     createdAt = createdAt
 )
-
+// task, tag?
 @DomainEvent(name = TAG_ASSIGNED_TO_TASK_EVENT)
 class TagAssignedToTaskEvent(
     val projectId: UUID,
@@ -59,7 +60,7 @@ class TagAssignedToTaskEvent(
     name = TAG_ASSIGNED_TO_TASK_EVENT,
     createdAt = createdAt
 )
-
+// project
 @DomainEvent(name = PARTICIPANT_ADDED_EVENT)
 class ParticipantAddedEvent(
         val projectId: UUID,
@@ -70,7 +71,7 @@ class ParticipantAddedEvent(
         name = PARTICIPANT_ADDED_EVENT,
         createdAt = createdAt
 )
-
+// task, project
 @DomainEvent(name = TASK_PERFORMER_SET_EVENT)
 class TaskPerformerSetEvent(
         val projectId: UUID,
@@ -81,7 +82,7 @@ class TaskPerformerSetEvent(
         name = TASK_PERFORMER_SET_EVENT,
         createdAt = createdAt
 )
-
+// project
 @DomainEvent(name = TITLE_CHANGED_EVENT)
 class ProjectTitleChangedEvent(
         val projectId: UUID,
@@ -91,7 +92,7 @@ class ProjectTitleChangedEvent(
         name = TITLE_CHANGED_EVENT,
         createdAt = createdAt
 )
-
+// project, tag?
 @DomainEvent(name = TAG_DELETED_EVENT)
 class TagDeletedEvent(
         val projectId: UUID,
@@ -101,7 +102,7 @@ class TagDeletedEvent(
         name = TAG_DELETED_EVENT,
         createdAt = createdAt
 )
-
+// project, task
 @DomainEvent(name = TASK_DELETED_EVENT)
 class TaskDeletedEvent(
         val projectId: UUID,
