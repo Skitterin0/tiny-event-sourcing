@@ -31,8 +31,10 @@ class ProjectAggregateState : AggregateState<UUID, ProjectAggregate> {
         creatorId = event.creatorId
         updatedAt = createdAt
 
-        var tagEvent = createTag(DEFAULT_TAG_NAME, DEFAULT_TAG_COLOR)
+        val tagEvent = createTag(DEFAULT_TAG_NAME, DEFAULT_TAG_COLOR)
         defaultTagId = tagEvent.tagId
+
+        tagCreatedApply(tagEvent)
     }
 
     @StateTransitionFunc
