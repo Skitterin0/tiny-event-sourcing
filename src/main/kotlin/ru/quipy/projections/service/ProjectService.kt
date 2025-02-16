@@ -1,6 +1,5 @@
 package ru.quipy.projections.service
 
-import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import ru.quipy.api.*
 import ru.quipy.core.EventSourcingService
@@ -61,5 +60,9 @@ class ProjectService {
 
         project.tags.remove(event.tagId)
         projectRepository.save(project)
+    }
+
+    fun getProject(id: UUID): ProjectView.ProjectInfo {
+        return projectRepository.findById(id).orElseThrow()
     }
 }
