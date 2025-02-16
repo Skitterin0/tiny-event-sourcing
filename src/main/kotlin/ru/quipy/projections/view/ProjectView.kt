@@ -12,8 +12,8 @@ class ProjectView {
             @Id
             override val id: UUID,
             var projectTitle: String,
+            var tags: MutableSet<UUID> = mutableSetOf(),
             var tasks: MutableSet<UUID> = mutableSetOf(),
             var participants: MutableSet<UUID> = mutableSetOf(),
-            var tags: MutableSet<UUID> = mutableSetOf()
     ): Unique<UUID>
 }
