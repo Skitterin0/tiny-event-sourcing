@@ -1,5 +1,6 @@
 package ru.quipy.controller
 
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PatchMapping
@@ -11,6 +12,12 @@ import org.springframework.web.bind.annotation.RestController
 import ru.quipy.api.*
 import ru.quipy.core.EventSourcingService
 import ru.quipy.logic.*
+import ru.quipy.projections.service.ProjectService
+import ru.quipy.projections.service.TagViewService
+import ru.quipy.projections.service.TaskViewService
+import ru.quipy.projections.view.ProjectView
+import ru.quipy.projections.view.TagView
+import ru.quipy.projections.view.TaskView
 import java.util.*
 
 @RestController
@@ -18,6 +25,12 @@ import java.util.*
 class ProjectController(
     val projectEsService: EventSourcingService<UUID, ProjectAggregate, ProjectAggregateState>
 ) {
+    @Autowired
+    lateinit var projectService: ProjectService
+    @Autowired
+    lateinit var taskService: TaskViewService
+    @Autowired
+    lateinit var tagService: TagViewService
 
     @PostMapping("/{projectTitle}")
     fun createProject(@PathVariable projectTitle: String, @RequestParam creatorId: UUID): ProjectCreatedEvent {
@@ -99,5 +112,20 @@ class ProjectController(
         return projectEsService.update(projectId) {
             it.deleteTask(taskId = taskId)
         }
+    }
+
+    @GetMapping("/{title}")
+    fun findProject(@PathVariable title: String): ProjectView.ProjectInfo {
+        return projectService.getProject(title)
+    }
+
+    @GetMapping("/{projectId}/tasks")
+    fun getTasks(@PathVariable projectId: UUID): List<TaskView.TaskInfo> {
+        return taskService.findByProjectId(projectId)
+    }
+
+    @GetMapping("/{projectId}/tags")
+    fun getTags(@PathVariable projectId: UUID): List<TagView.TagInfo> {
+        return tagService.findAllByProjectId(projectId)
     }
 }
