@@ -3,10 +3,10 @@ package ru.quipy.projections.service
 import org.springframework.stereotype.Service
 import ru.quipy.api.UserAggregate
 import ru.quipy.api.UserRegisteredEvent
-import ru.quipy.projections.repository.ProjectRepository
 import ru.quipy.projections.repository.UserRepository
 import ru.quipy.projections.view.UserView
 import ru.quipy.streams.AggregateSubscriptionsManager
+import java.util.*
 import javax.annotation.PostConstruct
 
 @Service
@@ -36,7 +36,11 @@ class UserViewService (
 		)
 	}
 
-	fun findUserByUsername(username: String): UserView.UserInfo? {
+	fun findByUsername(username: String): UserView.UserInfo? {
 		return userRepository.findByUsername(username)
+	}
+
+	fun userExists(userId: UUID): Boolean {
+		return userRepository.existsById(userId)
 	}
 }

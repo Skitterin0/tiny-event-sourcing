@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RestController
 import ru.quipy.api.UserAggregate
 import ru.quipy.api.UserRegisteredEvent
 import ru.quipy.core.EventSourcingService
+import ru.quipy.exceptions.AuthorizeException
 import ru.quipy.logic.UserAggregateState
 import ru.quipy.logic.register
 import ru.quipy.projections.service.TaskViewService
@@ -36,17 +37,26 @@ class UserController(
         return userEsService.create { it.register(UUID.randomUUID(), username, fullName, password) }
     }
 
-    @GetMapping("/{userId}")
-    fun getUser(@PathVariable userId: UUID): UserAggregateState? {
-        return userEsService.getState(userId)
+    @GetMapping("/{searchUserId}")
+    fun getUser(@PathVariable searchUserId: UUID, @RequestParam userId: UUID): UserAggregateState? {
+        if (!userService.userExists(userId)) {
+            throw AuthorizeException()
+        }
+        return userEsService.getState(searchUserId)
     }
 
     @GetMapping("/{username}")
-    fun findUser(@PathVariable username: String): UserView.UserInfo? {
-        return userService.findUserByUsername(username)
+    fun findUser(@PathVariable username: String, @RequestParam userId: UUID): UserView.UserInfo? {
+        if (!userService.userExists(userId)) {
+            throw AuthorizeException()
+        }
+        return userService.findByUsername(username)
     }
-    @GetMapping("/{userId}/tasks")
-    fun findTasks(@PathVariable userId: UUID): List<TaskView.TaskInfo> {
-        return taskService.findByUserID(userId)
+    @GetMapping("/{searchUserId}/tasks")
+    fun findTasks(@PathVariable searchUserId: UUID, @RequestParam userId: UUID): List<TaskView.TaskInfo> {
+        if (!userService.userExists(userId)) {
+            throw AuthorizeException()
+        }
+        return taskService.findByUserID(searchUserId)
     }
 }
