@@ -41,6 +41,6 @@ class UserViewService (
 	}
 
 	fun userExists(userId: UUID): Boolean {
-		return userRepository.existsById(userId);
+		return userRepository.existsById(userId)
 	}
 }
