@@ -36,6 +36,7 @@ class ProjectController(
     lateinit var taskService: TaskViewService
     @Autowired
     lateinit var tagService: TagViewService
+    val defaultTagName = "Created"
 
     @PostMapping("/{projectTitle}")
     fun createProject(@PathVariable projectTitle: String, @RequestParam creatorId: UUID): ProjectCreatedEvent {
@@ -168,6 +169,10 @@ class ProjectController(
         if (projectService.findTasksByTagId(tagId).isNotEmpty()) {
             throw RuntimeException("Can't delete assigned tag with tagId=$tagId")
         }
+        if (tagService.getTagById(tagId).tagName == defaultTagName) {
+            throw RuntimeException("Can't delete default project tag: tagId=$tagId")
+        }
+
         return projectEsService.update(projectId) {
             it.deleteTag(tagId = tagId)
         }

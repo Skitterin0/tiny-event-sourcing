@@ -47,4 +47,8 @@ class TagViewService(
 	fun findAllByProjectId(projectId: UUID): List<TagView.TagInfo> {
 		return tagRepository.findAllByProjectId(projectId)
 	}
+
+	fun getTagById(tagId: UUID): TagView.TagInfo {
+		return tagRepository.getTagInfoById(tagId)
+	}
 }

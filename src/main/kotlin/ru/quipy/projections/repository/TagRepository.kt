@@ -6,4 +6,5 @@ import java.util.*
 
 interface TagRepository: MongoRepository<TagView.TagInfo, UUID> {
 	fun findAllByProjectId(projectId: UUID): List<TagView.TagInfo>
+	fun getTagInfoById(tagId: UUID): TagView.TagInfo
 }
