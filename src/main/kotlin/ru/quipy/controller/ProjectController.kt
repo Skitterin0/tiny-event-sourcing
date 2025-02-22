@@ -101,9 +101,7 @@ class ProjectController(
         if (!projectService.getProject(projectId).participants.contains(userId)) {
             throw ParticipantException()
         }
-        if (!tagService.findAllByProjectId(projectId).map { tag -> tag.id }.contains(tagId)) {
-            throw RuntimeException("Can't assign tag: $tagId that doesn't exist in the project: $projectId")
-        }
+
         return projectEsService.update(projectId) {
             it.assignTagToTask(tagId = tagId, taskId = taskId)
         }
@@ -168,12 +166,6 @@ class ProjectController(
         }
         if (!projectService.getProject(projectId).participants.contains(userId)) {
             throw ParticipantException()
-        }
-        if (projectService.findTasksByTagId(tagId).isNotEmpty()) {
-            throw RuntimeException("Can't delete assigned tag with tagId=$tagId")
-        }
-        if (tagService.getTagById(tagId).tagName == defaultTagName) {
-            throw RuntimeException("Can't delete default project tag: tagId=$tagId")
         }
 
         return projectEsService.update(projectId) {
