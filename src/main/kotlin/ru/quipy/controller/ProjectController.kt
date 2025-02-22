@@ -37,6 +37,7 @@ class ProjectController(
     @Autowired
     lateinit var tagService: TagViewService
     val defaultTagName = "Created"
+    val defaultTagColor = "#ef2020"
 
     @PostMapping("/create")
     fun createProject(@RequestParam projectTitle: String, @RequestParam creator: String): ProjectCreatedEvent {
@@ -45,7 +46,15 @@ class ProjectController(
         if (!userService.userExists(creatorId)) {
             throw AuthorizeException()
         }
-        return projectEsService.create { it.create(UUID.randomUUID(), projectTitle, creatorId) }
+        val createEvent = projectEsService.create {
+            it.create(UUID.randomUUID(), projectTitle, creatorId)
+        }
+
+        projectEsService.update(createEvent.projectId) {
+            it.createTag(defaultTagName, defaultTagColor)
+        }
+
+        return createEvent
     }
 
     @GetMapping("/id")

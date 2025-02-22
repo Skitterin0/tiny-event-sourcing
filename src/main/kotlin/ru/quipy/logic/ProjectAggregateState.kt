@@ -30,15 +30,14 @@ class ProjectAggregateState : AggregateState<UUID, ProjectAggregate> {
         projectTitle = event.title
         creatorId = event.creatorId
         updatedAt = createdAt
-
-        val tagEvent = createTag(DEFAULT_TAG_NAME, DEFAULT_TAG_COLOR)
-        defaultTagId = tagEvent.tagId
-
-        tagCreatedApply(tagEvent)
     }
 
     @StateTransitionFunc
     fun tagCreatedApply(event: TagCreatedEvent) {
+        if (event.tagName == DEFAULT_TAG_NAME && !::defaultTagId.isInitialized) {
+            defaultTagId = event.tagId
+        }
+
         projectTags[event.tagId] = TagEntity(event.tagId, event.tagName, event.tagColor)
         updatedAt = event.createdAt
     }
