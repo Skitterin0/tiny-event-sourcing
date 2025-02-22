@@ -32,7 +32,7 @@ class TagViewService(
 	private fun createTag(event: TagCreatedEvent) {
 		tagRepository.save(
 			TagView.TagInfo(
-				id = event.id,
+				id = event.tagId,
 				projectId = event.projectId,
 				tagName = event.tagName,
 				tagColor = event.tagColor

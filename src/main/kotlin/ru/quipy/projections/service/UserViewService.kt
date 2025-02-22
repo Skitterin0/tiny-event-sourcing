@@ -26,7 +26,7 @@ class UserViewService (
 	private fun register(event: UserRegisteredEvent) {
 		userRepository.save(
 			UserView.UserInfo(
-				id = event.id,
+				id = event.userId,
 				username = event.username,
 				fullName = event.fullName,
 				password = event.password,
