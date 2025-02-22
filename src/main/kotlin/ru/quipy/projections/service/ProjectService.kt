@@ -1,12 +1,13 @@
 package ru.quipy.projections.service
 
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import ru.quipy.api.*
 import ru.quipy.core.EventSourcingService
 import ru.quipy.logic.ProjectAggregateState
 import ru.quipy.projections.repository.ProjectRepository
+import ru.quipy.projections.repository.TaskRepository
 import ru.quipy.projections.view.ProjectView
+import ru.quipy.projections.view.TaskView
 import ru.quipy.streams.AggregateSubscriptionsManager
 import java.util.*
 import javax.annotation.PostConstruct
@@ -15,7 +16,8 @@ import javax.annotation.PostConstruct
 class ProjectService(
     private val projectRepository: ProjectRepository,
     private val projectEsService: EventSourcingService<UUID, ProjectAggregate, ProjectAggregateState>,
-    private val subscriptionsManager: AggregateSubscriptionsManager
+    private val subscriptionsManager: AggregateSubscriptionsManager,
+    private val taskRepository: TaskRepository
 ) {
 
     @PostConstruct
@@ -51,7 +53,8 @@ class ProjectService(
                     event.title,
                     mutableSetOf<UUID>().apply {
                         tagId?.let { add(it) }
-                    }
+                    },
+                    participants = mutableSetOf<UUID>(event.creatorId)
             )
         )
     }
@@ -91,7 +94,15 @@ class ProjectService(
         projectRepository.save(project)
     }
 
-    fun getProject(projectTitle: String): ProjectView.ProjectInfo {
-        return projectRepository.findByProjectTitle(projectTitle).first()
+    fun getProject(projectId: UUID): ProjectView.ProjectInfo {
+        return projectRepository.findById(projectId).orElseThrow()
+    }
+
+    fun findByProjectTitle(projectTitle: String): List<ProjectView.ProjectInfo> {
+        return projectRepository.findByProjectTitle(projectTitle)
+    }
+
+    fun findTasksByTagId(tagId: UUID): List<TaskView.TaskInfo> {
+        return taskRepository.findByTagId(tagId)
     }
 }

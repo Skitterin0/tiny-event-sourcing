@@ -9,5 +9,5 @@ interface TaskRepository: MongoRepository<TaskView.TaskInfo, UUID> {
 
 	fun findByUserId(userId: UUID): List<TaskView.TaskInfo>
 
-
+	fun findByTagId(tagId: UUID): List<TaskView.TaskInfo>
 }
