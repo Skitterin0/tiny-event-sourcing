@@ -38,16 +38,21 @@ class ProjectController(
     lateinit var tagService: TagViewService
     val defaultTagName = "Created"
 
-    @PostMapping("/{projectTitle}")
-    fun createProject(@PathVariable projectTitle: String, @RequestParam creatorId: UUID): ProjectCreatedEvent {
+    @PostMapping("/create")
+    fun createProject(@RequestParam projectTitle: String, @RequestParam creator: String): ProjectCreatedEvent {
+        val creatorId = UUID.fromString(creator)
+
         if (!userService.userExists(creatorId)) {
             throw AuthorizeException()
         }
         return projectEsService.create { it.create(UUID.randomUUID(), projectTitle, creatorId) }
     }
 
-    @GetMapping("/{projectId}")
-    fun getProject(@PathVariable projectId: UUID, @RequestParam userId: UUID) : ProjectAggregateState? {
+    @GetMapping("/id")
+    fun getProject(@RequestParam project: String, @RequestParam user: String) : ProjectAggregateState? {
+        val projectId = UUID.fromString(project)
+        val userId = UUID.fromString(user)
+
         if (!userService.userExists(userId)) {
             throw AuthorizeException()
         }
@@ -56,163 +61,185 @@ class ProjectController(
 
     @PostMapping("/{projectId}/tasks/create")
     fun createTask(
-                    @PathVariable projectId: UUID,
+                    @PathVariable project: String,
                     @RequestParam taskName: String,
-                    @RequestParam creatorId: UUID): TaskCreatedEvent {
-        if (!userService.userExists(creatorId)) {
-            throw AuthorizeException()
-        }
-        if (!projectService.getProject(projectId).participants.contains(creatorId)) {
-            throw ParticipantException()
-        }
+                    @RequestParam creator: String): TaskCreatedEvent {
+        val projectId = UUID.fromString(project)
+        val creatorId = UUID.fromString(creator)
+
+        userCheck(projectId, creatorId)
+
         return projectEsService.update(projectId) {
             it.addTask(taskName, creatorId)
         }
     }
 
-    @PostMapping("/{projectId}/tags/create")
+    @PostMapping("/{project}/tags/create")
     fun createTag(
-            @PathVariable projectId: UUID,
+            @PathVariable project: String,
             @RequestParam tagName: String,
             @RequestParam tagColor: String,
-            @RequestParam userId: UUID
+            @RequestParam user: String
     ): TagCreatedEvent {
-        if (!userService.userExists(userId)) {
-            throw AuthorizeException()
-        }
-        if (!projectService.getProject(projectId).participants.contains(userId)) {
-            throw ParticipantException()
-        }
+        val projectId = UUID.fromString(project)
+        val userId = UUID.fromString(user)
+
+        userCheck(projectId, userId)
+
         return projectEsService.update(projectId) {
             it.createTag(name = tagName, color = tagColor)
         }
     }
 
-    @PatchMapping("/{projectId}/tasks/{taskId}/tags/assign")
+    @PatchMapping("/{project}/tasks/{task}/tags/assign")
     fun assignTagToTask(
-            @PathVariable projectId: UUID,
-            @PathVariable taskId: UUID,
-            @RequestParam tagId: UUID,
-            @RequestParam userId: UUID
+            @PathVariable project: String,
+            @PathVariable task: String,
+            @RequestParam tag: String,
+            @RequestParam user: String
     ): TagAssignedToTaskEvent {
-        if (!userService.userExists(userId)) {
-            throw AuthorizeException()
-        }
-        if (!projectService.getProject(projectId).participants.contains(userId)) {
-            throw ParticipantException()
-        }
+        val projectId = UUID.fromString(project)
+        val taskId = UUID.fromString(task)
+        val tagId = UUID.fromString(tag)
+        val userId = UUID.fromString(user)
+
+        userCheck(projectId, userId)
 
         return projectEsService.update(projectId) {
             it.assignTagToTask(tagId = tagId, taskId = taskId)
         }
     }
 
-    @PatchMapping("/{projectId}/participants/add")
+    @PatchMapping("/{project}/participants/add")
     fun addParticipant(
-            @PathVariable projectId: UUID,
-            @RequestParam participantId: UUID,
+            @PathVariable project: String,
+            @RequestParam participant: String,
             @RequestParam username: String,
-            @RequestParam userId: UUID
+            @RequestParam user: String
     ): ParticipantAddedEvent {
-        if (!userService.userExists(userId)) {
-            throw AuthorizeException()
-        }
-        if (!projectService.getProject(projectId).participants.contains(userId)) {
-            throw ParticipantException()
-        }
+        val projectId = UUID.fromString(project)
+        val participantId = UUID.fromString(participant)
+        val userId = UUID.fromString(user)
+
+        userCheck(projectId, userId)
+
         return projectEsService.update(projectId) {
             it.addParticipant(userId = participantId, username = username)
         }
     }
 
-    @PatchMapping("/{projectId}/tasks/{taskId}/performer")
+    @PatchMapping("/{project}/tasks/{task}/performer")
     fun setTaskPerformer(
-            @PathVariable projectId: UUID,
-            @PathVariable taskId: UUID,
-            @RequestParam performerId: UUID,
-            @RequestParam userId: UUID
+            @PathVariable project: String,
+            @PathVariable task: String,
+            @RequestParam performer: String,
+            @RequestParam user: String
     ): TaskPerformerSetEvent {
-        if (!userService.userExists(userId)) {
-            throw AuthorizeException()
-        }
-        if (!projectService.getProject(projectId).participants.contains(userId)) {
-            throw ParticipantException()
-        }
+        val projectId = UUID.fromString(project)
+        val taskId = UUID.fromString(task)
+        val performerId = UUID.fromString(performer)
+        val userId = UUID.fromString(user)
+
+        userCheck(projectId, userId)
+
         return projectEsService.update(projectId) {
             it.setTaskPerformer(taskId = taskId, userId = performerId)
         }
     }
 
-    @PatchMapping("/{projectId}/title")
+    @PatchMapping("/{project}/title")
     fun changeProjectTitle(
-            @PathVariable projectId: UUID,
+            @PathVariable project: String,
             @RequestParam title: String,
-            @RequestParam userId: UUID): ProjectTitleChangedEvent {
-        if (!userService.userExists(userId)) {
-            throw AuthorizeException()
-        }
-        if (!projectService.getProject(projectId).participants.contains(userId)) {
-            throw ParticipantException()
-        }
+            @RequestParam user: String): ProjectTitleChangedEvent {
+        val projectId = UUID.fromString(project)
+        val userId = UUID.fromString(user)
+
+        userCheck(projectId, userId)
+
         return projectEsService.update(projectId) {
             it.changeProjectTitle(title = title)
         }
     }
 
-    @DeleteMapping("/{projectId}/tags/delete")
-    fun deleteTag(@PathVariable projectId: UUID, @RequestParam tagId: UUID, userId: UUID): TagDeletedEvent {
-        if (!userService.userExists(userId)) {
-            throw AuthorizeException()
-        }
-        if (!projectService.getProject(projectId).participants.contains(userId)) {
-            throw ParticipantException()
-        }
+    @DeleteMapping("/{project}/tags/delete")
+    fun deleteTag(@PathVariable project: String, @RequestParam tag: String, @RequestParam user: String): TagDeletedEvent {
+        val projectId = UUID.fromString(project)
+        val userId = UUID.fromString(user)
+        val tagId = UUID.fromString(tag)
+
+        userCheck(projectId, userId)
 
         return projectEsService.update(projectId) {
             it.deleteTag(tagId = tagId)
         }
     }
 
-    @DeleteMapping("/{projectId}/tasks/delete")
-    fun deleteTask(@PathVariable projectId: UUID, @RequestParam taskId: UUID, userId: UUID): TaskDeletedEvent {
-        if (!userService.userExists(userId)) {
-            throw AuthorizeException()
-        }
-        if (!projectService.getProject(projectId).participants.contains(userId)) {
-            throw ParticipantException()
-        }
+    @DeleteMapping("/{project}/tasks/delete")
+    fun deleteTask(@PathVariable project: String, @RequestParam task: String, @RequestParam user: String): TaskDeletedEvent {
+        val projectId = UUID.fromString(project)
+        val userId = UUID.fromString(user)
+        val taskId = UUID.fromString(task)
+
+        userCheck(projectId, userId)
+
         return projectEsService.update(projectId) {
             it.deleteTask(taskId = taskId)
         }
     }
 
-    @GetMapping("/{title}")
-    fun findProject(@PathVariable title: String, userId: UUID): List<ProjectView.ProjectInfo> {
+    @GetMapping("/title")
+    fun findProject(@RequestParam title: String, @RequestParam user: String): List<ProjectView.ProjectInfo> {
+        val userId = UUID.fromString(user)
+
         if (!userService.userExists(userId)) {
             throw AuthorizeException()
         }
         return projectService.findByProjectTitle(title)
     }
 
-    @GetMapping("/{projectId}/tasks")
-    fun getTasks(@PathVariable projectId: UUID, userId: UUID): List<TaskView.TaskInfo> {
-        if (!userService.userExists(userId)) {
-            throw AuthorizeException()
-        }
-        if (!projectService.getProject(projectId).participants.contains(userId)) {
-            throw ParticipantException()
-        }
+    @GetMapping("/{project}/tasks")
+    fun getTasks(@PathVariable project: String, @RequestParam user: String): List<TaskView.TaskInfo> {
+        val projectId = UUID.fromString(project)
+        val userId = UUID.fromString(user)
+
+        userCheck(projectId, userId)
+
         return taskService.findByProjectId(projectId)
     }
 
-    @GetMapping("/{projectId}/tags")
-    fun getTags(@PathVariable projectId: UUID, userId: UUID): List<TagView.TagInfo> {
+    @GetMapping("/{project}/tags")
+    fun getTags(@PathVariable project: String, @RequestParam user: String): List<TagView.TagInfo> {
+        val projectId = UUID.fromString(project)
+        val userId = UUID.fromString(user)
+
+        userCheck(projectId, userId)
+
+        return tagService.findAllByProjectId(projectId)
+    }
+
+    @GetMapping("/{project}/kanban")
+    fun getKanban(@PathVariable project: String, @RequestParam user: String): Map<String, List<TaskView.TaskInfo>> {
+        val projectId = UUID.fromString(project)
+        val userId = UUID.fromString(user)
+
+        userCheck(projectId, userId)
+
+        val tagsMap = tagService.findAllByProjectId(projectId).associate { it.tagName to it.id }
+
+        val kanban = tagsMap.mapValues { (tagName, tagId) ->
+            projectService.findTasksByTagId(tagId)
+        }
+
+        return kanban
+    }
+
+    private fun userCheck(projectId: UUID, userId: UUID) {
         if (!userService.userExists(userId)) {
             throw AuthorizeException()
         }
         if (!projectService.getProject(projectId).participants.contains(userId)) {
             throw ParticipantException()
         }
-        return tagService.findAllByProjectId(projectId)
     }
 }

@@ -34,26 +34,38 @@ class UserController(
             @RequestParam username: String,
             @RequestParam fullName: String,
             @RequestParam password: String) : UserRegisteredEvent {
+        if (userService.findByUsername(username) != null) {
+            throw RuntimeException("User with such username already exists: $username")
+        }
+
         return userEsService.create { it.register(UUID.randomUUID(), username, fullName, password) }
     }
 
-    @GetMapping("/{searchUserId}")
-    fun getUser(@PathVariable searchUserId: UUID, @RequestParam userId: UUID): UserAggregateState? {
+    @GetMapping("/id")
+    fun getUser(@RequestParam searchUser: String, @RequestParam user: String): UserAggregateState? {
+        val searchUserId = UUID.fromString(searchUser)
+        val userId = UUID.fromString(user)
+
         if (!userService.userExists(userId)) {
             throw AuthorizeException()
         }
         return userEsService.getState(searchUserId)
     }
 
-    @GetMapping("/{username}")
-    fun findUser(@PathVariable username: String, @RequestParam userId: UUID): UserView.UserInfo? {
+    @GetMapping("/username")
+    fun findUser(@RequestParam username: String, @RequestParam searchUser: String): UserView.UserInfo? {
+        val userId = UUID.fromString(searchUser)
+
         if (!userService.userExists(userId)) {
             throw AuthorizeException()
         }
         return userService.findByUsername(username)
     }
-    @GetMapping("/{searchUserId}/tasks")
-    fun findTasks(@PathVariable searchUserId: UUID, @RequestParam userId: UUID): List<TaskView.TaskInfo> {
+    @GetMapping("/{searchUser}/tasks")
+    fun findTasks(@PathVariable searchUser: String, @RequestParam user: String): List<TaskView.TaskInfo> {
+        val searchUserId = UUID.fromString(searchUser)
+        val userId = UUID.fromString(user)
+
         if (!userService.userExists(userId)) {
             throw AuthorizeException()
         }
