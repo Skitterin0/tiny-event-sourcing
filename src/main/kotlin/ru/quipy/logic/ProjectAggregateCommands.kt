@@ -1,6 +1,5 @@
 package ru.quipy.logic
 
-import org.apache.el.stream.Stream
 import ru.quipy.api.*
 import java.util.*
 
@@ -12,8 +11,8 @@ fun ProjectAggregateState.create(id: UUID, title: String, creatorId: UUID): Proj
     return ProjectCreatedEvent(projectId = id, title = title, creatorId = creatorId)
 }
 
-fun ProjectAggregateState.addTask(name: String): TaskCreatedEvent {
-    return TaskCreatedEvent(projectId = this.getId(), taskId = UUID.randomUUID(), taskName = name)
+fun ProjectAggregateState.addTask(name: String, creatorId: UUID): TaskCreatedEvent {
+    return TaskCreatedEvent(projectId = this.getId(), taskId = UUID.randomUUID(), taskName = name, creator = creatorId)
 }
 
 fun ProjectAggregateState.createTag(name: String, color: String): TagCreatedEvent {

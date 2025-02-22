@@ -57,15 +57,15 @@ class ProjectController(
     fun createTask(
                     @PathVariable projectId: UUID,
                     @RequestParam taskName: String,
-                    @RequestParam userId: UUID): TaskCreatedEvent {
-        if (!userService.userExists(userId)) {
+                    @RequestParam creatorId: UUID): TaskCreatedEvent {
+        if (!userService.userExists(creatorId)) {
             throw AuthorizeException()
         }
-        if (!projectService.getProject(projectId).participants.contains(userId)) {
+        if (!projectService.getProject(projectId).participants.contains(creatorId)) {
             throw ParticipantException()
         }
         return projectEsService.update(projectId) {
-            it.addTask(taskName)
+            it.addTask(taskName, creatorId)
         }
     }
 

@@ -45,7 +45,7 @@ class ProjectAggregateState : AggregateState<UUID, ProjectAggregate> {
 
     @StateTransitionFunc
     fun taskCreatedApply(event: TaskCreatedEvent) {
-        tasks[event.taskId] = TaskEntity(event.taskId, event.taskName, defaultTagId, null)
+        tasks[event.taskId] = TaskEntity(event.taskId, event.taskName, defaultTagId, event.creator, null)
         updatedAt = event.createdAt
     }
 
@@ -84,6 +84,7 @@ data class TaskEntity(
     val id: UUID = UUID.randomUUID(),
     var name: String,
     var tag: UUID,
+    var creator: UUID,
     var performer: UUID?,
     val createdAt: Long = System.currentTimeMillis(),
     var updatedAt: Long = System.currentTimeMillis()
